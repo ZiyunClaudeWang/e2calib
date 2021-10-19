@@ -2,11 +2,20 @@ from pathlib import Path
 
 metavision_found = True
 ros_found = True
+'''
 try:
     import conversion.ros
 except ImportError:
     print("Conversion from .bag is not possible. If you want to extract .bag files, please install the ROS packages specified in the README.md")
     ros_found = False
+'''
+
+try:
+    import conversion.ros_prophesee_my
+except ImportError:
+    print("Conversion from a prophesee bag is impossible.")
+    ros_prophesee_found = False
+
 try:
     import conversion.prophesee
 except ImportError:
@@ -14,10 +23,13 @@ except ImportError:
     metavision_found = False
 
 
-def get_generator(input_file: Path, delta_t_ms: int=1000, topic: str='/dvs/events'):
+def get_generator(input_file: Path, delta_t_ms: int=1000, topic: str='/prophesee/camera/cd_events_buffer'):
     if input_file.suffix == '.raw':
         assert metavision_found, 'Could not find Metavision packages'
         return lambda: conversion.prophesee.ev_generator(input_file, delta_t_ms=delta_t_ms)
+
     assert input_file.suffix == '.bag', f'File format {input_file.suffix} is not supported'
     assert ros_found, 'Could not not find ROS packages'
-    return lambda: conversion.ros.ev_generator(input_file, delta_t_ms=delta_t_ms, topic=topic)
+    #return lambda: conversion.ros_prophesee.ev_generator(input_file, delta_t_ms=delta_t_ms, topic=topic)
+
+    return conversion.ros_prophesee_my.get_events(input_file)

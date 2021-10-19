@@ -151,3 +151,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+*.tar
+*.h5
+
+/python/gen3_no_trigger/
+
+
