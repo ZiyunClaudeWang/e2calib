@@ -75,8 +75,14 @@ if __name__ == "__main__":
     else:
         assert os.path.isdir(args.output_folder)
     '''
-    folder = h5_path.name.strip(".h5") + "_frames"
-    args.output_folder = os.path.join(h5_path.parent, folder)
+    folder = os.path.join(h5_path.parent.parent, h5_path.parent.name+"_frames", h5_path.name.strip(".h5"))
+    if not os.path.exists(args.output_folder):
+        os.makedirs(args.output_folder)
+    else:
+        assert os.path.isdir(args.output_folder)
+
+    #args.output_folder = os.path.join(h5_path.parent, folder)
+    args.output_folder = folder
     image_reconstructor = ImageReconstructor(model, args.height, args.width, model.num_bins, args)
     print('== Image reconstruction == ')
     print('Image size: {}x{}'.format(args.height, args.width))

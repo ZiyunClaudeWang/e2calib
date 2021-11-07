@@ -104,7 +104,6 @@ class ImageWriter:
     def __init__(self, options):
 
         self.output_folder = options.output_folder
-        self.dataset_name = options.dataset_name
         self.save_events = options.show_events
         self.event_display_mode = options.event_display_mode
         self.num_bins_to_show = options.num_bins_to_show
@@ -112,13 +111,12 @@ class ImageWriter:
             print('== Image Writer ==')
         if self.output_folder:
             ensure_dir(self.output_folder)
-            ensure_dir(join(self.output_folder, self.dataset_name))
             if options.verbose:
-                print('Will write images to: {}'.format(join(self.output_folder, self.dataset_name)))
+                print('Will write images to: {}'.format(join(self.output_folder)))
             # self.timestamps_file = open(join(self.output_folder, self.dataset_name, 'timestamps.txt'), 'a')
 
             if self.save_events:
-                self.event_previews_folder = join(self.output_folder, self.dataset_name, 'events')
+                self.event_previews_folder = join(self.output_folder, 'events')
                 ensure_dir(self.event_previews_folder)
                 if options.verbose:
                     print('Will write event previews to: {}'.format(self.event_previews_folder))
@@ -136,7 +134,7 @@ class ImageWriter:
             cv2.imwrite(join(self.event_previews_folder,
                              'events_{:019d}.png'.format(event_tensor_id)), event_preview)
 
-        cv2.imwrite(join(self.output_folder, self.dataset_name,
+        cv2.imwrite(join(self.output_folder, 
                          '{:019d}.png'.format(event_tensor_id)), img)
 
 
