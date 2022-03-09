@@ -1,5 +1,6 @@
 import argparse
 import os
+import pdb
 os.environ['CUDA_DEVICE_ORDER'] = 'PCI_BUS_ID'
 from pathlib import Path
 import urllib
@@ -7,6 +8,8 @@ import warnings
 
 import torch
 import tqdm
+
+import torch.nn.functional as F
 
 from data.provider import DataProvider
 from data.rectimestamps import TimestampProviderFile, TimestampProviderRate
@@ -32,6 +35,9 @@ if __name__ == "__main__":
     parser.add_argument('-c', '--path_to_model', type=str,
                         help='path to the model weights',
                         default='reconstruction/pretrained/E2VID_lightweight.pth.tar')
+
+    parser.add_argument('--save_folder', help='path to save', default='~/data_temp')
+
     parser.add_argument('--height', type=int, default=480)
     parser.add_argument('--width', type=int, default=640)
     parser.add_argument('--gpu_id',  type=int, default=0)
@@ -58,7 +64,8 @@ if __name__ == "__main__":
         timestamps_file = Path(args.timestamps_file)
         assert timestamps_file.exists()
         timestamp_provider = TimestampProviderFile(timestamps_file)
-    data_provider = DataProvider(h5_path, height=args.height, width=args.width, timestamp_provider=timestamp_provider)
+    data_provider = DataProvider(h5_path, height=args.height, 
+                width=args.width, timestamp_provider=timestamp_provider)
 
     # Load model to device
     if not os.path.isfile(args.path_to_model):
@@ -69,18 +76,20 @@ if __name__ == "__main__":
     model = model.to(device)
     model.eval()
 
-    '''
-    if not os.path.exists(args.output_folder):
-        os.makedirs(args.output_folder)
+    if not os.path.exists(args.save_folder):
+        os.makedirs(args.save_folder)
+        pdb.set_trace()
     else:
-        assert os.path.isdir(args.output_folder)
+        assert os.path.isdir(args.save_folder)
     '''
     folder = os.path.join(h5_path.parent.parent, h5_path.parent.name+"_frames", h5_path.name.strip(".h5"))
     if not os.path.exists(args.output_folder):
         os.makedirs(args.output_folder)
     else:
         assert os.path.isdir(args.output_folder)
+    '''
 
+    folder = args.save_folder
     #args.output_folder = os.path.join(h5_path.parent, folder)
     args.output_folder = folder
     image_reconstructor = ImageReconstructor(model, args.height, args.width, model.num_bins, args)
@@ -100,6 +109,8 @@ if __name__ == "__main__":
                     event_grid, _ = grid.events_to_voxel_grid(sliced_events[i])
                     event_grid = grid.normalize_voxel(event_grid)
                     event_tensor = torch.from_numpy(event_grid)
+
+                    #event_tensor = F.interpolate(event_tensor.unsqueeze(1), (480, 640))[:, 0, ...]
                     image_reconstructor.update_reconstruction(event_tensor)
                 if i== len(sliced_events) - 1:
                     rec_ts_nanoseconds = int(events.t_reconstruction)*1000

@@ -14,10 +14,12 @@ class Events:
     size: int = field(init=False)
 
     def __post_init__(self):
+        '''
         assert self.x.dtype == np.uint16
         assert self.y.dtype == np.uint16
         assert self.p.dtype == np.uint8
         assert self.t.dtype == np.int64
+        '''
 
         assert self.x.shape == self.y.shape == self.p.shape == self.t.shape
         assert self.x.ndim == 1

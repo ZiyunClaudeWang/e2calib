@@ -26,7 +26,7 @@ class TimestampProviderRate(TimestampProviderBase):
         super().__init__()
         assert reconstruction_frequency_hz > 0
 
-        self.delta_t_us = int(1/reconstruction_frequency_hz*10**6)
+        self.delta_t_us = int(1/reconstruction_frequency_hz*10**9)
 
         # We still need to initialize the following values
         self.t_end_us = None

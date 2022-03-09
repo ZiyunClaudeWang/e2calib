@@ -2,6 +2,7 @@ import gc
 from pathlib import Path
 from typing import Optional
 import weakref
+import pdb
 
 import h5py
 import numpy as np
@@ -67,9 +68,10 @@ class SharedBufferProducer:
         self.num_events = self.h5f['t'].size
 
         self._done = False
+        self.t_start_us = int(self.h5f['t'][0])
 
-        self.t_start_us = self.h5f['t'][0]
-        self.t_end_us = self.h5f['t'][-1]
+        #TODO: fix the timestamps
+        self.t_end_us = int(self.h5f['t'][-600000])
 
     @staticmethod
     def close_callback(h5f: h5py.File):

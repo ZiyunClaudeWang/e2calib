@@ -17,6 +17,7 @@ class VoxelGrid:
         sliced_events = []
         t_start = events.t[0]
         t_end = t_reconstruction
+        import pdb;
         window_time = (t_end - t_start + 1)//self.upsample_rate
         indices = [0]
         max_idx = len(events.t) - 1
@@ -31,6 +32,7 @@ class VoxelGrid:
                 assert indices[i+1] == indices[i]
                 sliced_events.append(None)
                 continue
+            print("num events: ", indices[i+1] - indices[i])
             ts = events.t[indices[i]:indices[i+1]]
             sliced_events.append( Events(events.x[indices[i]:indices[i+1]],
                                         events.y[indices[i]:indices[i+1]],
