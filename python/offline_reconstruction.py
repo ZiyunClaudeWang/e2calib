@@ -8,6 +8,7 @@ import warnings
 
 import torch
 import tqdm
+import hdf5plugin
 
 import torch.nn.functional as F
 

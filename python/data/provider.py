@@ -65,13 +65,20 @@ class SharedBufferProducer:
         self.read_step = 10**7
 
         self.idx_0 = 0
-        self.num_events = self.h5f['t'].size
 
         self._done = False
-        self.t_start_us = int(self.h5f['t'][0])
+        self.num_events = self.h5f['t'].size
+        self.t_start_us = int(self.h5f['t'][0] * 1e3)
+        self.t_end_us = int(self.h5f['t'][-600000] * 1e3)
 
-        #TODO: fix the timestamps
-        self.t_end_us = int(self.h5f['t'][-600000])
+        '''
+        self.num_events = self.h5f['dvs/t'].size
+        self.t_start_us = int(self.h5f['dvs/t'][0])
+        self.t_end_us = int(self.h5f['dvs/t'][-800000])
+        '''
+        #self.t_end_us = int(self.h5f['dvs/t'][-1])
+
+        print(self.t_start_us, self.t_end_us)
 
     @staticmethod
     def close_callback(h5f: h5py.File):
@@ -86,11 +93,18 @@ class SharedBufferProducer:
         if self._done:
             idx_1 = self.num_events
         if idx_1 > self.idx_0:
+            '''
+            read_events = Events(
+                    self.h5f['dvs/x'][self.idx_0:idx_1],
+                    self.h5f['dvs/y'][self.idx_0:idx_1],
+                    self.h5f['dvs/p'][self.idx_0:idx_1],
+                    self.h5f['dvs/t'][self.idx_0:idx_1])
+            '''
             read_events = Events(
                     self.h5f['x'][self.idx_0:idx_1],
                     self.h5f['y'][self.idx_0:idx_1],
                     self.h5f['p'][self.idx_0:idx_1],
-                    self.h5f['t'][self.idx_0:idx_1])
+                    self.h5f['t'][self.idx_0:idx_1]*1e3)
             self.shared_ev_buffer.add_events(read_events)
         self.idx_0 = idx_1
 
